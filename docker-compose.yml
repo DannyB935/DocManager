@@ -1,0 +1,23 @@
+services:
+  sql-server-oficios:
+    build:
+      context: ./sql-server
+      dockerfile: Dockerfile
+    container_name: sql-server-oficios
+    environment:
+      - SA_PASSWORD=${DB_PASS}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-server-data:/var/opt/mssql
+      - ./sql-server/init.sql:/init.sql
+    command: >
+      /bin/bash -c "
+        /opt/mssql/bin/sqlservr &
+        sleep 10 &&
+        /opt/mssql-tools18/bin/sqlcmd -No -S localhost -U SA -P '${DB_PASS}' -i /init.sql &&
+        wait
+      "
+volumes:
+  sql-server-data:
+    driver: local
