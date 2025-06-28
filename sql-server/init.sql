@@ -8,6 +8,7 @@ GO
 USE DocManager;
 GO
 
+-- If the documents table exists, it means the whole schema has been initialized.
 CREATE TABLE DOCUMENTS(
 	id INT NOT NULL IDENTITY PRIMARY KEY,
 	doc_num NVARCHAR(64),
@@ -151,7 +152,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN
-		-- If the documents is external and there's no input document number. We generate a generic one.
+		-- If the documents is external and there''s no input document number. We generate a generic one.
 		IF @doc_num_input IS NULL OR @doc_num_input = ''
 		BEGIN
 			SELECT TOP 1
@@ -197,5 +198,6 @@ BEGIN
 			inserted.doc_type,
 			inserted.anonym,
 			inserted.deleted
-		FROM inserted;	
+		FROM inserted;
+
 END;

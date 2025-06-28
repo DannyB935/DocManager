@@ -12,12 +12,15 @@ services:
       - sql-server-data:/var/opt/mssql
       - ./sql-server/init.sql:/init.sql
     command: >
-      /bin/bash -c "
+      /bin/bash -c '
         /opt/mssql/bin/sqlservr &
         sleep 10 &&
-        /opt/mssql-tools18/bin/sqlcmd -No -S localhost -U SA -P '${DB_PASS}' -i /init.sql &&
+        if [ ! -f /tmp/db_initialized ]; then
+          /opt/mssql-tools18/bin/sqlcmd -No -S localhost -U SA -P "${DB_PASS}" -i /init.sql &&
+          touch /tmp/db_initialized && echo "Database initialized";
+        fi &&
         wait
-      "
+      '
 volumes:
   sql-server-data:
     driver: local
