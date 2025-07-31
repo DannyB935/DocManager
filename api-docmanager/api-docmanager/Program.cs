@@ -1,7 +1,8 @@
-using api_docmanager.Database;
 using api_docmanager.Entities;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
+DotNetEnv.Env.Load("../../.env");
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,7 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 //Add DbContext as a service using the connection string
-builder.Services.AddDbContext<DocManagerContext>(options => options.UseSqlServer("name=DefaultConnection"));
+builder.Services.AddDbContext<DocManagerContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

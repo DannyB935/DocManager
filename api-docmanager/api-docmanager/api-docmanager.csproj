@@ -6,9 +6,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>api_docmanager</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>0878095a-2c26-462c-a60c-12010d583a9c</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="14.0.0" />
+        <PackageReference Include="DotNetEnv" Version="3.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
           <PrivateAssets>all</PrivateAssets>
