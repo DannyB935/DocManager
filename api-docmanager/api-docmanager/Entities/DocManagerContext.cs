@@ -25,9 +25,6 @@ public partial class DocManagerContext : DbContext
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //    => optionsBuilder.UseSqlServer("name=DefaultConnection");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AssignmentLog>(entity =>
@@ -196,6 +193,9 @@ public partial class DocManagerContext : DbContext
             entity.Property(e => e.NameUsr)
                 .HasMaxLength(64)
                 .HasColumnName("name_usr");
+            entity.Property(e => e.Password)
+                .HasMaxLength(1000)
+                .HasColumnName("password");
             entity.Property(e => e.UnitBelong)
                 .HasDefaultValueSql("(NULL)")
                 .HasColumnName("unit_belong");

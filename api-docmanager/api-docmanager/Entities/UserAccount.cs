@@ -19,6 +19,8 @@ public partial class UserAccount
 
     public bool? Deleted { get; set; }
 
+    public string Password { get; set; } = null!;
+
     public virtual ICollection<AssignmentLog> AssignmentLogs { get; set; } = new List<AssignmentLog>();
 
     public virtual ICollection<Document> DocumentGenByUsrNavigations { get; set; } = new List<Document>();
