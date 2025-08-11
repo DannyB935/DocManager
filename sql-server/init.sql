@@ -41,6 +41,7 @@ CREATE TABLE USER_ACCOUNTS(
 	name_usr NVARCHAR(64) NOT NULL,
 	lname NVARCHAR(128),
 	email NVARCHAR(256),
+	password NVARCHAR(1000),
 	unit_belong INT DEFAULT NULL,
 	usr_role INT,
 	deleted BIT DEFAULT 0,
@@ -112,7 +113,7 @@ GO
 
 CREATE TRIGGER tgr_generate_doc_num
 ON DOCUMENTS
-INSTEAD OF INSERT
+AFTER INSERT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -125,11 +126,13 @@ BEGIN
 	DECLARE @counter INT;
 	DECLARE @doc_type INT;
 	DECLARE @doc_num_input NVARCHAR(64);
+	DECLARE @id INT;
 
 	SELECT TOP 1 
 		@unit_belong = unit_belong,
 		@doc_type = doc_type,
-		@doc_num_input = doc_num
+		@doc_num_input = doc_num,
+		@id = Id
 	FROM inserted;
 
 	-- Checks if the document is internal or external. 0 = internal, 1 = external.
@@ -140,7 +143,9 @@ BEGIN
 		SELECT TOP 1
 			@num_year = YEAR(date_create),
 			@counter = TRY_CAST(LEFT(doc_num, 6) AS INT)
-		FROM DOCUMENTS ORDER BY id DESC;
+		FROM DOCUMENTS
+		WHERE doc_type = 0 AND deleted = 0 AND id <> @id
+		ORDER BY id DESC;
 
 		IF @counter IS NULL OR @num_year != @current_year
 			SET @counter = 1;
@@ -158,7 +163,9 @@ BEGIN
 			SELECT TOP 1
 				@num_year = YEAR(date_create),
 				@counter = TRY_CAST(LEFT(doc_num, 6) AS INT)
-			FROM DOCUMENTS WHERE doc_type = 1 ORDER BY id DESC;
+			FROM DOCUMENTS 
+			WHERE doc_type = 1 AND deleted = 0 AND id <> @id
+			ORDER BY id DESC;
 
 			IF @counter IS NULL OR @num_year != @current_year
 				SET @counter = 1;
@@ -173,31 +180,7 @@ BEGIN
 		END
 	END
 
-	-- Insert the new document with the generated document number
-		INSERT INTO DOCUMENTS (doc_num, subject, body, usr_sender, name_sender, lname_sender, title_sender, position_sender, usr_recip, name_recip, lname_recip, title_recip, position_recip, unit_belong, dept_name, date_create, date_done, usr_assign, gen_by_usr, doc_type, anonym, deleted)
-		SELECT
-			@doc_num,
-			inserted.subject,
-			inserted.body,
-			inserted.usr_sender,
-			inserted.name_sender,
-			inserted.lname_sender,
-			inserted.title_sender,
-			inserted.position_sender,
-			inserted.usr_recip,
-			inserted.name_recip,
-			inserted.lname_recip,
-			inserted.title_recip,
-			inserted.position_recip,
-			inserted.unit_belong,
-			inserted.dept_name,
-			inserted.date_create,
-			inserted.date_done,
-			inserted.usr_assign,
-			inserted.gen_by_usr,
-			inserted.doc_type,
-			inserted.anonym,
-			inserted.deleted
-		FROM inserted;
+	-- UPDATE the new document with the generated document number
+	UPDATE DOCUMENTS SET doc_num = @doc_num WHERE id = @id;
 
 END;

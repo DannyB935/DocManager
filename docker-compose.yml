@@ -6,6 +6,7 @@ services:
     container_name: sql-server-oficios
     environment:
       - SA_PASSWORD=${DB_PASS}
+      - TZ=America/Mexico_City
     ports:
       - "1433:1433"
     volumes:
