@@ -1,4 +1,5 @@
-﻿using api_docmanager.Dtos.Users;
+﻿using api_docmanager.Dtos.Documents;
+using api_docmanager.Dtos.Users;
 using api_docmanager.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -125,6 +126,35 @@ public class UsersController : ControllerBase
         }
     }
 
+    [HttpGet("{code:int}/docs", Name = "GetUserDocs")]
+    public async Task<ActionResult<List<DocDto>>> GetUserDocuments(int code)
+    {
+        try
+        {
+            var usrDocs = await _context.Documents
+                .Where(doc => doc.Deleted == false && doc.GenByUsr == code)
+                .Include(doc => doc.UnitBelongNavigation)
+                .Include(doc => doc.GenByUsrNavigation)
+                .OrderByDescending(doc => doc.DateCreate)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                message = "User documents retrieved successfully",
+                status = 200,
+                docs = _mapper.Map<List<DocDto>>(usrDocs)
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new
+            {
+                message = e.Message,
+                status = 500
+            });
+        }
+    }
+    
     [HttpDelete("{code:int}", Name = "DeleteUser")]
     public async Task<ActionResult> DeleteUser(int? code)
     {
@@ -190,7 +220,7 @@ public class UsersController : ControllerBase
             });
         }
     }
-
+    
     [HttpPatch("{code:int}", Name = "PutPassword")]
     public async Task<ActionResult> PutPassword(int code, [FromForm] UpdatePasswordDto updatePassword)
     {
