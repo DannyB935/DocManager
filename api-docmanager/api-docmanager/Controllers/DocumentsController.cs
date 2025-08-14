@@ -1,8 +1,10 @@
-﻿using api_docmanager.Dtos.Documents;
+﻿using System.Globalization;
+using api_docmanager.Dtos.Documents;
 using api_docmanager.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Xceed.Words.NET;
 
 namespace api_docmanager.Controllers;
 
@@ -12,11 +14,13 @@ public class DocumentsController: ControllerBase
 {
     private readonly DocManagerContext _context;
     private readonly IMapper _mapper;
+    private readonly IWebHostEnvironment _envHost;
 
-    public DocumentsController(DocManagerContext context, IMapper mapper)
+    public DocumentsController(DocManagerContext context, IMapper mapper, IWebHostEnvironment env)
     {
         this._context = context;
         this._mapper = mapper;
+        this._envHost = env;
     }
 
     [HttpPost(Name = "CreateDocument")]
@@ -130,6 +134,65 @@ public class DocumentsController: ControllerBase
         }
     }
 
+    [HttpGet("{id:int}/file", Name="DownloadFile")]
+    public async Task<ActionResult> DownloadDocFile(int id)
+    {
+        try
+        {
+            var doc = await _context.Documents
+                .Where(doc => doc.Id == id && doc.Deleted == false)
+                .Include(doc => doc.GenByUsrNavigation)
+                .Include(doc => doc.UnitBelongNavigation)
+                .FirstOrDefaultAsync();
+            
+            if (doc == null)
+            {
+                return NotFound(new
+                {
+                    message = $"Document with the ID '{id}' could not be found",
+                    status = 404
+                });
+            }
+            
+            var docDto = _mapper.Map<DocDto>(doc);
+
+            string fileName = doc.DocNum.Replace("/", "-");
+            string templatePath = Path.Combine(_envHost.ContentRootPath, "Utils", "template_doc.docx");
+            string formatedDate = doc.DateCreate?.ToString("d 'de' MMMM 'del' yyyy", new CultureInfo("es-MX"));
+            
+            using (var docStream = DocX.Load(templatePath))
+            {
+                docStream.ReplaceText("{date}", formatedDate);
+                docStream.ReplaceText("{doc_num}", doc.DocNum);
+                docStream.ReplaceText("{title_recip}", docDto.TitleRecip);
+                docStream.ReplaceText("{full_name_recip}", docDto.FullNameRecip);
+                docStream.ReplaceText("{position_recip}", docDto.PositionRecip);
+                docStream.ReplaceText("{department_recip}", docDto.DeptName);
+                docStream.ReplaceText("{body}", docDto.Body);
+                docStream.ReplaceText("{title_sender}", docDto.TitleSender);
+                docStream.ReplaceText("{full_name_sender}", docDto.FullNameSender);
+                docStream.ReplaceText("{position_sender}", docDto.PositionSender);
+                
+                using (var stream = new MemoryStream())
+                {
+                    docStream.SaveAs(stream);
+                    stream.Position = 0;
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+                        $"{fileName}.docx");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new
+            {
+                message = e.Message,
+                status = 500
+            });
+        }
+    }
+    
     [HttpGet("docnum", Name = "GetDocumentByDocNum")]
     public async Task<ActionResult<DocDto>> GetDocumentByDocNum([FromQuery] string? value)
     {
