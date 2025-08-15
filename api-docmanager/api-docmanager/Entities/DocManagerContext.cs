@@ -34,9 +34,13 @@ public partial class DocManagerContext : DbContext
             entity.ToTable("ASSIGNMENT_LOGS");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Concluded)
+                .HasDefaultValue(false)
+                .HasColumnName("concluded");
             entity.Property(e => e.DateAssign)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnName("date_assign");
+            entity.Property(e => e.DateConcluded).HasColumnName("date_concluded");
             entity.Property(e => e.DocId).HasColumnName("doc_id");
             entity.Property(e => e.UsrAssign).HasColumnName("usr_assign");
 
@@ -64,6 +68,9 @@ public partial class DocManagerContext : DbContext
             entity.Property(e => e.Body)
                 .HasMaxLength(1042)
                 .HasColumnName("body");
+            entity.Property(e => e.Concluded)
+                .HasDefaultValue(false)
+                .HasColumnName("concluded");
             entity.Property(e => e.DateCreate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnName("date_create");

@@ -32,6 +32,7 @@ CREATE TABLE DOCUMENTS(
 	gen_by_usr INT DEFAULT NULL,
 	doc_type INT DEFAULT 0,
 	anonym BIT DEFAULT 0,
+	concluded BIT DEFAULT 0,
 	deleted BIT DEFAULT 0,
 );
 GO
@@ -68,6 +69,8 @@ CREATE TABLE ASSIGNMENT_LOGS(
 	doc_id INT NOT NULL,
 	usr_assign INT NOT NULL,
 	date_assign DATETIME2 DEFAULT GETDATE(),
+	concluded BIT DEFAULT 0,
+	date_concluded DATETIME2 DEFAULT NULL
 );
 GO
 

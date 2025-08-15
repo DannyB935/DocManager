@@ -51,6 +51,8 @@ public partial class Document
 
     public bool? Deleted { get; set; }
 
+    public bool? Concluded { get; set; }
+
     public virtual ICollection<AssignmentLog> AssignmentLogs { get; set; } = new List<AssignmentLog>();
 
     public virtual UserAccount? GenByUsrNavigation { get; set; }

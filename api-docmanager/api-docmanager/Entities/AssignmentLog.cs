@@ -13,6 +13,10 @@ public partial class AssignmentLog
 
     public DateTime? DateAssign { get; set; }
 
+    public bool? Concluded { get; set; }
+
+    public DateTime? DateConcluded { get; set; }
+
     public virtual Document Doc { get; set; } = null!;
 
     public virtual UserAccount UsrAssignNavigation { get; set; } = null!;
