@@ -315,4 +315,48 @@ public class DocumentsController: ControllerBase
             });   
         }
     }
+
+    [HttpPut("conclude", Name = "ConcludeDocument")]
+    public async Task<ActionResult> ConcludeDocument(ConcludeDocDto newConclude)
+    {
+        try
+        {
+            var tempDoc = await _context.Documents
+                .Where(doc => doc.Deleted == false && doc.Id == newConclude.DocId && doc.Concluded == false)
+                .FirstOrDefaultAsync();
+
+            if (tempDoc == null)
+            {
+                return NotFound(new
+                {
+                    message = $"The document with the ID {newConclude.DocId} was not found or has already been concluded",
+                    status = 404
+                });
+            }
+            
+            tempDoc.Concluded = true;
+            //The final assigned user will always be the one who concluded it
+            tempDoc.UsrAssign = newConclude.UsrAssign;
+            tempDoc.DateDone = DateTime.Now;
+
+            var assignLog = _mapper.Map<AssignmentLog>(newConclude);
+            _context.AssignmentLogs.Add(assignLog);
+            
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"The document with the ID {newConclude.DocId} was concluded",
+                status = 200
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new
+            {
+                message = e.Message,
+                status = 500
+            });
+        }
+    }
 }

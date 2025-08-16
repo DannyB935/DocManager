@@ -1,4 +1,5 @@
-﻿using api_docmanager.Dtos.Documents;
+﻿using api_docmanager.Dtos.Assignments;
+using api_docmanager.Dtos.Documents;
 using api_docmanager.Dtos.Unit;
 using api_docmanager.Dtos.Users;
 using api_docmanager.Entities;
@@ -35,6 +36,12 @@ public class AutoMapperProfiles: Profile
             .ForMember(dto => dto.GenByUsrName,
                 config => config.MapFrom(doc => GetFullName(doc.GenByUsrNavigation)));
         CreateMap<UpdateDocDto, Document>();
+        
+        //Assignment log maps
+        CreateMap<CreateAssignDto, AssignmentLog>();
+        CreateMap<ConcludeDocDto, AssignmentLog>();
+        CreateMap<AssignmentLog, AssignmentDto>()
+            .ForMember(dto => dto.FullNameUsr, config => config.MapFrom(src => GetFullName(src.UsrAssignNavigation)));
     }
 
     private string GetFullName(UserAccount user) => $"{user.NameUsr} {user.Lname}";
