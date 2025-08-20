@@ -31,6 +31,7 @@ CREATE TABLE DOCUMENTS(
 	usr_assign INT DEFAULT NULL,
 	gen_by_usr INT DEFAULT NULL,
 	doc_type INT DEFAULT 0,
+	registered BIT DEFAULT 0,
 	anonym BIT DEFAULT 0,
 	concluded BIT DEFAULT 0,
 	deleted BIT DEFAULT 0,
