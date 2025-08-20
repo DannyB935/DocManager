@@ -117,6 +117,10 @@ public partial class DocManagerContext : DbContext
                 .HasMaxLength(128)
                 .HasDefaultValueSql("(NULL)")
                 .HasColumnName("position_sender");
+            entity.Property(e => e.Registered)
+                .HasDefaultValue((byte)0)
+                .HasComment("If the document is registered or created. 0 = created, 1 = registered")
+                .HasColumnName("registered");
             entity.Property(e => e.Subject)
                 .HasMaxLength(128)
                 .HasColumnName("subject");

@@ -53,6 +53,11 @@ public partial class Document
 
     public bool? Concluded { get; set; }
 
+    /// <summary>
+    /// If the document is registered or created. 0 = created, 1 = registered
+    /// </summary>
+    public byte? Registered { get; set; }
+
     public virtual ICollection<AssignmentLog> AssignmentLogs { get; set; } = new List<AssignmentLog>();
 
     public virtual UserAccount? GenByUsrNavigation { get; set; }

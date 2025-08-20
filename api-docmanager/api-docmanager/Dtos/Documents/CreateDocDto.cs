@@ -69,5 +69,8 @@ public class CreateDocDto
     [Range(0, 1, ErrorMessage = "The {0} must be either {1} or {2}.")]
     public int? DocType { get; set; }
     
+    [Required(ErrorMessage = "The document has to be either type created or registered")]
+    public byte? Registered { get; set; }
+    
     public bool? Anonym { get; set; }
 }
