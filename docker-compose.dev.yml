@@ -1,0 +1,39 @@
+name: docmanager-dev
+services:
+  sql-server-oficios-dev:
+    build:
+      context: ./sql-server
+      dockerfile: Dockerfile
+    container_name: sql-server-oficios-dev
+    environment:
+      - SA_PASSWORD=${DB_PASS}
+      - TZ=America/Mexico_City
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-server-data:/var/opt/mssql
+      - ./sql-server/init.sql:/init.sql
+    command: >
+      /bin/bash -c '
+        /opt/mssql/bin/sqlservr &
+        sleep 10 &&
+        if [ ! -f /tmp/db_initialized ]; then
+          /opt/mssql-tools18/bin/sqlcmd -No -S localhost -U SA -P "${DB_PASS}" -i /init.sql &&
+          touch /tmp/db_initialized && echo "Database initialized";
+        fi &&
+        wait
+      '
+  api-docmanager:
+    build:
+      context: ./api-docmanager
+      dockerfile: ./api-docmanager/Dockerfile
+    ports:
+      - "5006:8080"
+      - "8081:8081"
+    depends_on:
+      - sql-server-oficios-dev
+    environment:
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+volumes:
+  sql-server-data:
+    driver: local
