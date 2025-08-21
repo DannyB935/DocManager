@@ -70,7 +70,7 @@ public class CreateDocDto
     public int? DocType { get; set; }
     
     [Required(ErrorMessage = "The document has to be either type created or registered")]
-    public byte? Registered { get; set; }
+    public bool? Registered { get; set; }
     
     public bool? Anonym { get; set; }
 }
