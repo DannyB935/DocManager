@@ -23,10 +23,7 @@ public class CreateUserDto
     [Required(ErrorMessage = "The {0} is required")]
     public required string Password { get; set; }
     
-    [FromForm(Name = "unit")]
-    [Required(ErrorMessage = "The {0} has to be chosen")]
-    [Range(1, int.MaxValue, ErrorMessage = "The {0} value is not valid")]
-    public required int UnitBelong { get; set; }
+    public required int? UnitBelong { get; set; }
     
     [FromForm(Name = "role")]
     public required int? UsrRole { get; set; }
