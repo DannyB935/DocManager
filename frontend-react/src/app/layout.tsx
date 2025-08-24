@@ -17,9 +17,9 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     <html lang="en" className={`${inter.className} light`}>
       <body>
         <Providers>
-          <main className="min-h-dvh flex flex-col">
+          <div className="min-h-dvh flex flex-col">
             {children}
-          </main>
+          </div>
         </Providers>
       </body>
     </html>
